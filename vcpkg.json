@@ -1,0 +1,15 @@
+{
+    "name": "gusengine",
+    "version": "0.1.0",
+    "dependencies": [
+        "glfw3",
+        "glm",
+        "stb",
+        {
+            "name": "imgui",
+            "features": ["glfw-binding", "vulkan-binding"]
+        },
+        "vk-bootstrap",
+        "glslang"
+    ]
+}

@@ -17,7 +17,7 @@ using namespace std;
 
 // This namespace contains macros, methods, and classes used to provide detailed runtime type information (RTTI) to the engine.
 #define GUS_DECLARE_CLASS(NAME, DERIVED) \
-friend class engine_type_registry::type_registry; \
+friend engine_type_registry::type_registry; \
 static void _register_type(); \
 public: \
 static string _ClassNameStatic() {return #NAME;} \
@@ -98,6 +98,8 @@ static Variant call_class_method_helper(T* obj, R(T::* method)(Args...) const, c
 }
 
 namespace engine_type_registry {
+	class type_registry;
+
 	class ObjectMethod {
 		public:
 		ObjectRTTIModel::ObjectMethodDefinition methodMetadata;
@@ -138,8 +140,8 @@ namespace engine_type_registry {
 	};
 
 	class EngineClass {
-		friend class type_registry;
-		friend class Object;
+		friend type_registry;
+		friend Object;
 		private:
 		string _className = "";
 		string _parentClassName = "";

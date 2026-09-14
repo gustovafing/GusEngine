@@ -1,9 +1,9 @@
 #include "renderer.h"
-#include <external/vkBootstrap/VkBootstrap.h>
+#include <VkBootstrap.h>
 
-#include <external/imGUI/imgui.h>
-#include <external/imGUI/imgui_impl_glfw.h>
-#include <external/imGUI/imgui_impl_vulkan.h>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_vulkan.h>
 
 #include "graphicsPipeline.h"
 #include "descriptorBuilder.h"
@@ -16,6 +16,8 @@ void Renderer::Init(GLFWwindow* window) {
 	Log.Info("Renderer", "Vulkan: Init Done");
 }
 
+
+/*
 void Renderer::initImGUI()
 {
 
@@ -23,8 +25,6 @@ void Renderer::initImGUI()
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
 	ImGui_ImplGlfw_InitForVulkan(_window, false);
 
@@ -33,20 +33,16 @@ void Renderer::initImGUI()
 	init_info.PhysicalDevice = _physicalDevice;
 	init_info.Device = _device;
 	init_info.Queue = queues[QueueType::graphics];
-	init_info.DescriptorPoolSize = IMGUI_IMPL_VULKAN_MINIMUM_IMAGE_SAMPLER_POOL_SIZE+2;
+	init_info.DescriptorPoolSize = IMGUI_IMPL_VULKAN_MINIMUM_SAMPLED_IMAGE_POOL_SIZE+2;
 	init_info.MinImageCount = 2;
 	init_info.ImageCount = 2;
 	init_info.UseDynamicRendering = true;
-	init_info.PipelineRenderingCreateInfo = { .sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO };
-	init_info.PipelineRenderingCreateInfo.colorAttachmentCount = 1;
-	init_info.PipelineRenderingCreateInfo.pColorAttachmentFormats = &_swapchain.image_format;
-	init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 
 	ImGui_ImplVulkan_Init(&init_info);
 
 	ImGui_ImplVulkan_CreateFontsTexture();
 
-}
+}*/
 
 void Renderer::initVulkan() {
 	createInstanceAndDevice();
@@ -64,27 +60,23 @@ void Renderer::initVulkan() {
 	createGraphicsPipeline();
 	createFramebuffers();
 
-	initImGUI();
+	//initImGUI();
 }
 
 void Renderer::RefreshFramebuffer() {
 	recreateSwapChain();
 }
 
-void Renderer::BeginFrameProcessing() {
-	bool demoshow = true;
-	ImGui_ImplVulkan_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-	ImGui::NewFrame();
-	
-	ImGui::ShowDemoWindow(&demoshow);
-}
-
 void Renderer::ProcessFrame() {
+	bool demoshow = true;
+	//ImGui_ImplVulkan_NewFrame();
+	//ImGui_ImplGlfw_NewFrame();
+	//ImGui::NewFrame();
+
+	//ImGui::ShowDemoWindow(&demoshow);
+
 	drawFrame();
-	ImGui::Render();
-	ImGui::UpdatePlatformWindows();
-	ImGui::RenderPlatformWindowsDefault();
+	//ImGui::Render();
 	VK_ASSERT(vkDeviceWaitIdle(_device));
 }
 

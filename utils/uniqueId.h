@@ -1,9 +1,12 @@
 #pragma once
 #include <compare>
 #include <stdint.h>
+
+class IdGen;
+
 // An integer id used to uniquely identify objects.
 class Id {
-	friend class IdGen;
+	friend IdGen;
 	private:
 	uint32_t _id;
 	uint32_t _genId;

@@ -7,7 +7,10 @@
 
 
 template <typename T>
-concept IsIntegerEnum = (std::is_enum<T>::value) && (std::is_same_v<std::underlying_type_t<T>, int32_t>);
+concept IsIntegerEnum = (std::is_enum_v<T>) && (std::is_same_v<std::underlying_type_t<T>, int32_t>);
+
+template <typename T>
+concept VariantScalar = std::is_arithmetic_v<std::decay_t<T>>; // covers bool, int32_t, uint32_t, int64_t, uint64_t, float, double
 
 // Implementation of a variant data type, which can dynamically hold primitve data types, used to correctly cast data for use with RTTI.
 struct Variant {
@@ -33,7 +36,7 @@ struct Variant {
 
 	};
 
-	inline static string VariantTypeToString(StoredType type) {
+	static string VariantTypeToString(StoredType type) {
 		switch (type) {
 			case StoredType::Empty:
 				return "Empty";
@@ -87,36 +90,36 @@ struct Variant {
 
 	template <typename T>
 	T Value() const {
-		return operator T();
-	};
+		return static_cast<T>(*this);
+	}
 
 	// Returns true if the value seems to be false like or 0 like.
-	bool IsValueFalseLike() inline const {
+	bool IsValueFalseLike() const {
 		if (IsEmptyOrVoid()) return true;
 		switch (_currentType) {
 			case StoredType::String:
-				return ((string*)_primitiveData._ptr)->empty();
+				return static_cast<string *>(_primitiveData._ptr)->empty();
 			case StoredType::VariantArray:
-				return ((std::vector<Variant>*)_primitiveData._ptr)->empty();
+				return static_cast<std::vector<Variant> *>(_primitiveData._ptr)->empty();
 			default:
-				return operator bool() == false;
+				return this->operator bool() == false;
 		}
 	}
 
 
-	bool IsEmptyOrVoid() inline const {
+	bool IsEmptyOrVoid() const {
 		return _currentType & (StoredType::Void | StoredType::Empty);
 	}
 
-	bool IsInt() inline const {
+	bool IsInt() const {
 		return (_currentType & (StoredType::Int32 | StoredType::UInt32 | StoredType::Int64 | StoredType::UInt64));
 	};
 
-	bool IsNumeric() inline const {
+	bool IsNumeric() const {
 		return (_currentType & (StoredType::Int32 | StoredType::UInt32 | StoredType::Int64 | StoredType::UInt64 | StoredType::Float | StoredType::Double));
 	};
 
-	bool IsSignedInt() inline const {
+	bool IsSignedInt() const {
 		return (_currentType & (StoredType::Int32 | StoredType::Int64));
 	};
 
@@ -273,8 +276,8 @@ struct Variant {
 		}
 	};
 
-	template<typename T>
-	operator T() const {
+	template<typename T> requires VariantScalar<T>
+	explicit operator T() const {
 		using U = std::decay_t<T>;
 		if constexpr (std::is_same_v<U, bool>) {
 			switch (_currentType) {
@@ -326,38 +329,36 @@ struct Variant {
 			case StoredType::Double:
 				return std::to_string(_primitiveData._double);
 			case StoredType::String:
-				return *(string*)_primitiveData._ptr;
+				return *static_cast<string *>(_primitiveData._ptr);
+			default:
+				return "";
 		}
+	}
 
-		return "";
-	};
-
-	operator std::vector<Variant>() const {
+	explicit operator std::vector<Variant>() const {
 		switch (_currentType) {
 			case StoredType::VariantArray:
-				return *(std::vector<Variant>*)_primitiveData._ptr;
+				return *static_cast<std::vector<Variant> *>(_primitiveData._ptr);
 			default:
 				return {};
 		}
 	}
 
-	operator std::vector<uint32_t>() const {
+	explicit operator std::vector<uint32_t>() const {
 		switch (_currentType) {
 			case StoredType::UInt32Array:
-				return *(std::vector<uint32_t>*)_primitiveData._ptr;
+				return *static_cast<std::vector<uint32_t> *>(_primitiveData._ptr);
 			default:
 				return {};
 		}
 	}
 
 	template <typename E> requires IsIntegerEnum<E>
-	operator E() const noexcept {
+	explicit operator E() const noexcept {
 		return static_cast<E>(_primitiveData._int);
 	}
 
 	friend bool operator==(const Variant& lhs, const Variant& rhs) {
-		return (Variant::_same(lhs, rhs));
-	};
-
-
+		return _same(lhs, rhs);
+	}
 };

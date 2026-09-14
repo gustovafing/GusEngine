@@ -7,10 +7,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(Vulkan REQUIRED)
-
-set(GLFW_ROOT "C:/Users/ofoxs/source/modules/glfw-3.4.bin.WIN64")
-set(GLM_ROOT  "C:/Users/ofoxs/source/modules/glm-1.0.1")
-set(STB_ROOT  "C:/Users/ofoxs/source/modules/stb")
+find_package(glfw3 CONFIG REQUIRED)
+find_package(glm CONFIG REQUIRED)
+find_path(STB_INCLUDE_DIRS "stb_image.h")
+find_package(imgui CONFIG REQUIRED)
+find_package(vk-bootstrap CONFIG REQUIRED)
+find_package(glslang CONFIG REQUIRED)
 
 set(SOURCES
         core/globals.cpp
@@ -35,16 +37,6 @@ set(SOURCES
         utils/logger.cpp
         utils/uniqueId.cpp
 
-        external/imGUI/imgui.cpp
-        external/imGUI/imgui_demo.cpp
-        external/imGUI/imgui_draw.cpp
-        external/imGUI/imgui_tables.cpp
-        external/imGUI/imgui_widgets.cpp
-        external/imGUI/imgui_impl_glfw.cpp
-        external/imGUI/imgui_impl_vulkan.cpp
-
-        external/vkBootstrap/VkBootstrap.cpp
-
         main.cpp
 )
 
@@ -54,22 +46,18 @@ add_executable(GusEngine
 
 target_include_directories(GusEngine PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
-
-        "${GLFW_ROOT}/include"
-        "${GLM_ROOT}"
-        "${STB_ROOT}"
-
-        "$ENV{VULKAN_SDK}/Include"
-        "${CMAKE_CURRENT_SOURCE_DIR}/external"
-)
-
-target_link_directories(GusEngine PRIVATE
-        "${GLFW_ROOT}/lib-vc2022"
+        "${STB_INCLUDE_DIRS}"
 )
 
 target_link_libraries(GusEngine PRIVATE
         Vulkan::Vulkan
-        glfw3
+        glfw
+        glm::glm
+        imgui::imgui
+        vk-bootstrap::vk-bootstrap
+        glslang::glslang
+        glslang::SPIRV
+        glslang::glslang-default-resource-limits
 )
 
 if (MSVC)
@@ -79,7 +67,6 @@ if (MSVC)
             /permissive-
     )
 
-    # Equivalent to the project's /IGNORE:4099
     target_link_options(GusEngine PRIVATE
             /IGNORE:4099
     )
@@ -89,6 +76,7 @@ target_compile_definitions(GusEngine PRIVATE
         $<$<CONFIG:Debug>:_DEBUG>
         $<$<CONFIG:Release>:NDEBUG>
         _CONSOLE
+        GLM_FORCE_PURE
 )
 
 if (MSVC)

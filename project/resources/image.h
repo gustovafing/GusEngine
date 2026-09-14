@@ -26,11 +26,11 @@ namespace resources {
 
 		public:
 
-		ImageFormat GetFormat() inline const {return _format; };
-		int32_t GetWidth() inline const {return _width; };
-		int32_t GetHeight() inline const {return _height; };
-		int32_t GetChannels() inline const {return _channels; };
-		bool Is16Bit() inline const {
+		ImageFormat GetFormat() const {return _format; };
+		int32_t GetWidth() const {return _width; };
+		int32_t GetHeight() const {return _height; };
+		int32_t GetChannels() const {return _channels; };
+		bool Is16Bit() const {
 			return (_format == ImageFormat::FORMAT_16L || _format == ImageFormat::FORMAT_16LA || _format == ImageFormat::FORMAT_16RGB || _format == ImageFormat::FORMAT_16RGBA);
 		}
 

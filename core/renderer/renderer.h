@@ -13,8 +13,7 @@
 #include <cstdlib>
 #include "filesystem/resource_loader.h"
 #include "core/globals.h"
-#include <external/vkBootstrap/VkBootstrap.h>
-#define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
+#include <VkBootstrap.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <chrono>
@@ -107,7 +106,6 @@ class Renderer {
 
 	void Init(GLFWwindow* window);
 	void RefreshFramebuffer();
-	void BeginFrameProcessing();
 	void ProcessFrame();
 	void Cleanup();
 	private:
@@ -135,7 +133,7 @@ class Renderer {
 	BufferAlloc indexBuffer;
 	std::vector<SwapchainImage> swapchainImages;
 
-	void initImGUI();
+	//void initImGUI();
 
 	/// Rendering init and cleanup
 	void initVulkan();

@@ -35,10 +35,10 @@ bool Variant::_same(const Variant& v1, const Variant& v2)
 char* Variant::BinarySerialise(Variant v)
 {
 	char* buffer;
-	short typeVal = static_cast<short>(v._currentType);
+	short typeVal = v._currentType;
 	switch (v.Type()) {
-		case StoredType::Empty:
-		case StoredType::Void:
+		case Empty:
+		case Void:
 			buffer = new char[VARIANT_ENUM_SIZE];
 			memcpy(buffer, &typeVal, VARIANT_ENUM_SIZE);
 			buffer[0] = static_cast<char>(v.Type());
@@ -173,31 +173,31 @@ Variant Variant::FromString(std::string* str)
 	if ((*str).starts_with(";")) {
 		return Variant(Variant::Void);
 	}
-	else if (type == "Bool") {
+	if (type == "Bool") {
 		return Variant(content == "1" ? true : false);
 	}
-	else if (type == "Int32") {
+	if (type == "Int32") {
 		return Variant(std::stoi(content));
 	}
-	else if (type == "UInt32") {
+	if (type == "UInt32") {
 		return Variant(static_cast<uint32_t>(std::stoul(content)));
 	}
-	else if (type == "LLong") {
+	if (type == "LLong") {
 		return Variant(std::stoll(content));
 	}
-	else if (type == "ULLong") {
+	if (type == "ULLong") {
 		return Variant(std::stoull(content));
 	}
-	else if (type == "Float") {
+	if (type == "Float") {
 		return Variant(std::stof(content));
 	}
-	else if (type == "Double") {
+	if (type == "Double") {
 		return Variant(std::stod(content));
 	}
-	else if (type == "String") {
+	if (type == "String") {
 		content.pop_back();
 		return Variant(content.substr(1));
 	}
 
-	return Variant(Variant::Empty);
+	return Variant(Empty);
 }

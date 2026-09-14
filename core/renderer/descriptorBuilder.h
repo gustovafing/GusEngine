@@ -1,6 +1,5 @@
 #pragma once
 #include <vulkan/vulkan.h>
-#include <external/vkBootstrap/VkBootstrap.h>
 #include "core/globals.h"
 #include <vector>
 
@@ -41,7 +40,7 @@ class DescriptorAllocator {
 		{
 			VkDescriptorPoolSize poolSize{};
 			poolSize.type = _bindings[i].descriptorType;
-			poolSize.descriptorCount = static_cast<uint32_t>(_bindings[i].descriptorCount) * totalLayouts;
+			poolSize.descriptorCount = _bindings[i].descriptorCount * totalLayouts;
 			
 			poolSizes.push_back(poolSize);
 

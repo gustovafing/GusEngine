@@ -7,10 +7,11 @@
 #include "resource_loader.h"
 using namespace resources;
 namespace EngineIO {
-	
+	class FileSystem;
+
 	class File {
-		friend class FileSystem;
-		friend class ResourceLoader;
+		friend FileSystem;
+		friend ResourceLoader;
 		private:
 		std::fstream _file;
 		string _path;
@@ -23,9 +24,9 @@ namespace EngineIO {
 			_file = std::fstream(filePath, mode);
 		}
 		public:
-		string FilePath() inline const {return _path; }
-		string FileName() inline const {return _name; }
-		string FileType() inline const {return _type; }
+		string FilePath() const {return _path; }
+		string FileName() const {return _name; }
+		string FileType() const {return _type; }
 		string ReadAllText() {
 			fstream f = fstream(_path, std::ios::ate | std::ios::in | std::ios::out);
 			size_t fileSize = (size_t)f.tellg();

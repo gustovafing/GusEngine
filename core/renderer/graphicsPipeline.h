@@ -1,6 +1,6 @@
 #pragma once
 #include <vulkan/vulkan.h>
-#include <external/vkBootstrap/VkBootstrap.h>
+#include <VkBootstrap.h>
 #include "core/globals.h"
 #include <vector>
 class GraphicsPipelineBuilder {

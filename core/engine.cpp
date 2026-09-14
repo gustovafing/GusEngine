@@ -33,7 +33,7 @@ void Engine::initWindow() {
 }
 
 void Engine::framebufferResizeCallback(GLFWwindow* window, int32_t width, int32_t height) {
-	auto app = reinterpret_cast<Engine*>(glfwGetWindowUserPointer(window));
+	const auto app = static_cast<Engine*>(glfwGetWindowUserPointer(window));
 	app->_framebufferChanged = true;
 }
 
@@ -45,7 +45,6 @@ void Engine::MainLoop() {
 			_framebufferChanged = false;
 		}
 
-		_renderer.BeginFrameProcessing();
 		_renderer.ProcessFrame();
 	}
 
