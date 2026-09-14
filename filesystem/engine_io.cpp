@@ -4,14 +4,35 @@
 using namespace resources;
 using namespace EngineIO;
 
-string EngineIO::File::GetHash() {
-	string data = ReadAllText();
+string File::ReadAllText() const {
+	fstream f = fstream(_path, std::ios::ate | std::ios::in | std::ios::out);
+	const size_t fileSize = f.tellg();
+	std::vector<char> buffer(fileSize + 1);
+	f.seekg(0);
+	f.read(buffer.data(), fileSize);
+	f.close();
+
+	return string(buffer.data());
+}
+
+string File::GetHash() const {
+	const string data = ReadAllText();
 	return md5::hash(data.data(), data.size());
 }
 
-void EngineIO::ObjectSaver::SerialiseResourceBinary(Resource* res, std::string filepath)
+vector<uint8_t> File::ReadAllBinary() const {
+	auto f = fstream(_path, std::ios::ate | std::ios::binary | std::ios::in | std::ios::out);
+	const size_t fileSize = (size_t)f.tellg();
+	std::vector<char> buffer(fileSize);
+	f.seekg(0);
+	f.read(buffer.data(), fileSize);
+	f.close();
+	return { buffer.begin(), buffer.end() };
+}
+
+void ObjectSaver::SerialiseResourceBinary(Resource* res, std::string filepath)
 {
-	File outFile = EngineIO::FileSystem::OpenOrCreateFile(filepath, std::ios::binary | std::ios::out);
+	File outFile = FileSystem::OpenOrCreateFile(filepath, std::ios::binary | std::ios::out);
 	fstream* outStream = outFile.GetFileStream();
 	string className = res->_ClassName();
 	string resourceName = res->Name();
@@ -35,7 +56,7 @@ void EngineIO::ObjectSaver::SerialiseResourceBinary(Resource* res, std::string f
 
 }
 
-void EngineIO::ObjectSaver::SerialiseResourceText(Resource res, std::string filepath)
+void ObjectSaver::SerialiseResourceText(Resource res, std::string filepath)
 {
 	fstream* outFile = (FileSystem::OpenOrCreateFile(filepath, std::ios::out).GetFileStream());
 	*outFile << "[" << res._ClassName() << "] " << res.Name()  << std::endl;
@@ -51,7 +72,7 @@ void EngineIO::ObjectSaver::SerialiseResourceText(Resource res, std::string file
 
 }
 
-Variant EngineIO::ObjectLoader::LoadBinaryVariant(File* input)
+Variant ObjectLoader::LoadBinaryVariant(File* input)
 {
 	fstream* inStream = input->GetFileStream();
 	short* typeBin = new short;
@@ -103,9 +124,9 @@ Variant EngineIO::ObjectLoader::LoadBinaryVariant(File* input)
 	return Variant();
 }
 
-Resource* EngineIO::ObjectLoader::LoadSerialisedResourceBinary(std::string filepath)
+Resource* ObjectLoader::LoadSerialisedResourceBinary(std::string filepath)
 {
-	File file = EngineIO::FileSystem::OpenFile(filepath, std::ios::in | std::ios::binary);
+	File file = FileSystem::OpenFile(filepath, std::ios::in | std::ios::binary);
 	fstream* inFile = file.GetFileStream();
 
 	if (!inFile->is_open()) {
@@ -150,8 +171,8 @@ Resource* EngineIO::ObjectLoader::LoadSerialisedResourceBinary(std::string filep
 	return res;
 }
 
-Resource* EngineIO::ObjectLoader::LoadSerialisedResourceText(std::string filepath)
+Resource* ObjectLoader::LoadSerialisedResourceText(std::string filepath)
 {
-	File file = EngineIO::FileSystem::OpenFile(filepath, std::ios::in);
+	File file = FileSystem::OpenFile(filepath, std::ios::in);
 	return nullptr;
 }

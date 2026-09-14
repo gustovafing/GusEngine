@@ -41,8 +41,8 @@ namespace resources {
 			return _spirvBinary;
 		}
 
-		ShaderLanguage GetLanguage() const { return _lang; };
-		ShaderStage GetStage() const { return _stage; };
+		ShaderLanguage GetLanguage() const { return _lang; }
+		ShaderStage GetStage() const { return _stage; }
 
 	};
 }

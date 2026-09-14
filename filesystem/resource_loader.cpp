@@ -2,6 +2,10 @@
 #include "engine_io.h"
 #include <stdio.h>
 
+// Resource Types
+#include "project/resources/shader.h"
+#include "project/resources/image.h"
+
 using namespace EngineIO;
 std::unordered_map<string, Resource*> ResourceLoader::loadedResources;
 std::unordered_map<string, ResourceLoader::ImportedResource> ResourceLoader::projectResources;
@@ -11,8 +15,8 @@ void ResourceLoader::Init() {
     fstream* cacheStream = resourceCache.GetFileStream();
     string line;
 
-    while (std::getline(resourceCache._file, line)) {
-        ResourceLoader::ImportedResource ir;
+    while (std::getline(*cacheStream, line)) {
+        ImportedResource ir;
         std::stringstream ss(line);
         std::getline(ss, ir.location, ',');
         std::getline(ss, ir.hash);

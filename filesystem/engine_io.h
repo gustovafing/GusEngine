@@ -11,44 +11,29 @@ namespace EngineIO {
 
 	class File {
 		friend FileSystem;
-		friend ResourceLoader;
 		private:
 		std::fstream _file;
 		string _path;
 		string _type;
 		string _name;
+
 		File(string filePath, std::ios_base::openmode mode) {
 			_path = filePath;
 			_type = filesystem::path(filePath).extension().string();
 			_name = filesystem::path(filePath).stem().string();
 			_file = std::fstream(filePath, mode);
 		}
+
 		public:
 		string FilePath() const {return _path; }
 		string FileName() const {return _name; }
 		string FileType() const {return _type; }
-		string ReadAllText() {
-			fstream f = fstream(_path, std::ios::ate | std::ios::in | std::ios::out);
-			size_t fileSize = (size_t)f.tellg();
-			std::vector<char> buffer(fileSize + 1);
-			f.seekg(0);
-			f.read(buffer.data(), fileSize);
-			f.close();
-			return string(buffer.data());
-		};
 
-		string GetHash();
+		string ReadAllText() const;
 
-		vector<uint8_t> ReadAllBinary() {
-			fstream f = fstream(_path, std::ios::ate | std::ios::binary | std::ios::in | std::ios::out);
-			size_t fileSize = (size_t)f.tellg();
-			std::vector<char> buffer(fileSize);
-			f.seekg(0);
-			f.read(buffer.data(), fileSize);
-			f.close();
-			return { buffer.begin(), buffer.end() };
-		};
+		string GetHash() const;
 
+		vector<uint8_t> ReadAllBinary() const;
 
 		fstream* GetFileStream() {return &_file; }
 

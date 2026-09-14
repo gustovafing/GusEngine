@@ -9,9 +9,8 @@ int32_t main(int32_t argc, char* argv[]) {
 		args.assign(argv + 1, argv + argc);
 	}
 
-	Engine engine;
-
 	try {
+		Engine engine;
 		engine.Run(args);
 	}
 	catch (const std::exception& e) {

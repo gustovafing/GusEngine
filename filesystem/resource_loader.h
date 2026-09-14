@@ -3,9 +3,6 @@
 #include "core/types/resource.h"
 #include <unordered_map>
 
-// Resource Types
-#include "project/resources/shader.h"
-#include "project/resources/image.h"
 using namespace resources;
 
 class ResourceLoader
