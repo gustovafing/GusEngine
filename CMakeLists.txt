@@ -35,7 +35,7 @@ set(SOURCES
         project/resources/shader.cpp
 
         utils/logger.cpp
-        utils/uniqueId.cpp
+        utils/unique_id.cpp
 
         main.cpp
 )

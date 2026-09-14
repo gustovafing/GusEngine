@@ -3,6 +3,9 @@
 #include "core/types/type_registry.h"
 #include "core/types/object.h"
 #include <string>
+
+#include "utils/unique_id.h"
+
 namespace resources {
 
 	class Resource : public Object

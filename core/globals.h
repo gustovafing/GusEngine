@@ -1,8 +1,8 @@
 #pragma once
 
-#include "utils/logger.h"
 #include <stdint.h>
-#include "utils/uniqueId.h"
+#include "utils/logger.h"
+
 extern Logger Log;
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
