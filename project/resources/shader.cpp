@@ -25,16 +25,15 @@ void resources::Shader::_register_type() {
 	type_registry::register_new_class("Shader", "Resource");
 	type_registry::class_expose_method(ObjectMethodDefinition("GetLanguage", Variant::StoredType::Int32), &Shader::GetLanguage);
 	type_registry::class_expose_method(ObjectMethodDefinition("GetStage", Variant::StoredType::Int32), &Shader::GetStage);
-	//type_registry::class_expose_method(ObjectMethodDefinition("GetShaderSPIRV", Variant::StoredType::UInt32), &Shader::GetShaderSPIRV);
 
-	ObjectRTTIModel::ObjectPropertyDefinition langProp = ObjectPropertyDefinition("Language", Variant::StoredType::Int32, ObjectPropertyDefinition::INTERNAL_SAVE, "GetLanguage");
-	ObjectRTTIModel::ObjectPropertyDefinition stageProp = ObjectPropertyDefinition("Stage", Variant::StoredType::Int32, ObjectPropertyDefinition::INTERNAL_SAVE, "GetStage");
+	const auto langProp = ObjectPropertyDefinition("Language", Variant::StoredType::Int32, ObjectPropertyDefinition::INTERNAL_SAVE, "GetLanguage");
+	const auto stageProp = ObjectPropertyDefinition("Stage", Variant::StoredType::Int32, ObjectPropertyDefinition::INTERNAL_SAVE, "GetStage");
 	type_registry::class_define_property(langProp);
 	type_registry::class_define_property(stageProp);
 	type_registry::end_class();
 }
 
-resources::Shader* resources::Shader::Create(const std::string& source, ShaderLanguage lang, ShaderStage type)
+resources::Shader::Shader(const std::string& source, ShaderLanguage lang, ShaderStage type)
 {
 	std::vector<uint32_t> spirv;
 	std::string	info_log;
@@ -51,7 +50,7 @@ resources::Shader* resources::Shader::Create(const std::string& source, ShaderLa
 	if (type == ShaderStage::StageGeom) stage = EShLangGeometry;
 	if (type == ShaderStage::StageComp) stage = EShLangCompute;
 
-	const char* shader_source = reinterpret_cast<const char*>(source.data());
+	auto shader_source = source.data();
 
 	glslang::TShader shader(stage);
 	shader.setStringsWithLengths(&shader_source, nullptr, 1);
@@ -64,7 +63,7 @@ resources::Shader* resources::Shader::Create(const std::string& source, ShaderLa
 	if (!shader.parse(GetDefaultResources(), 100, false, messages))
 	{
 		Log.Error("ResourceLoader: GLSLang", "Failed to parse GLSL shader, Error:" + std::string(shader.getInfoLog()) + "\n" + std::string(shader.getInfoDebugLog()));
-		return {};
+		return;
 	}
 
 	glslang::TProgram program;
@@ -73,26 +72,21 @@ resources::Shader* resources::Shader::Create(const std::string& source, ShaderLa
 	if (!program.link(messages))
 	{
 		Log.Error("ResourceLoader: GLSLang", "Failed to compile GLSL shader, Error:" + std::string(shader.getInfoLog()) + "\n" + std::string(shader.getInfoDebugLog()));
-		return {};
+		return;
 	}
 
 	glslang::TIntermediate* intermediate = program.getIntermediate(stage);
 	if (!intermediate)
 	{
 		Log.Error("ResourceLoader: GLSLang", "Failed to get generated SPIRV, Error:" + std::string(shader.getInfoLog()) + "\n" + std::string(shader.getInfoDebugLog()));
-		return {};
+		return;
 	}
 
 	spv::SpvBuildLogger logger;
 	glslang::GlslangToSpv(*intermediate, spirv, &logger);
 	glslang::FinalizeProcess();
 
-	Shader* newShader = new Shader();
-	newShader->_spirvBinary = spirv;
-	newShader->_stage = type;
-	newShader->_lang = lang;
-	return newShader;
-}
-
-resources::Shader::~Shader() {
+	_spirvBinary = spirv;
+	_stage = type;
+	_lang = lang;
 }

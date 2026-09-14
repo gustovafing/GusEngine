@@ -36,31 +36,31 @@ struct Variant {
 
 	};
 
-	static string VariantTypeToString(StoredType type) {
+	static string VariantTypeToString(const StoredType type) {
 		switch (type) {
-			case StoredType::Empty:
+			case Empty:
 				return "Empty";
-			case StoredType::Void:
+			case Void:
 				return "Void";
-			case StoredType::Bool:
+			case Bool:
 				return "Bool";
-			case StoredType::Int32:
+			case Int32:
 				return "Int32";
-			case StoredType::UInt32:
+			case UInt32:
 				return "UInt32";
-			case StoredType::Int64:
+			case Int64:
 				return "Int64";
-			case StoredType::UInt64:
+			case UInt64:
 				return "UInt64";
-			case StoredType::Float:
+			case Float:
 				return "Float";
-			case StoredType::Double:
+			case Double:
 				return "Double";
-			case StoredType::String:
+			case String:
 				return "String";
-			case StoredType::VariantArray:
+			case VariantArray:
 				return "VariantArray";
-			case StoredType::UInt32Array:
+			case UInt32Array:
 				return "UInt32Array";
 			default:
 				return "";
@@ -97,9 +97,9 @@ struct Variant {
 	bool IsValueFalseLike() const {
 		if (IsEmptyOrVoid()) return true;
 		switch (_currentType) {
-			case StoredType::String:
+			case String:
 				return static_cast<string *>(_primitiveData._ptr)->empty();
-			case StoredType::VariantArray:
+			case VariantArray:
 				return static_cast<std::vector<Variant> *>(_primitiveData._ptr)->empty();
 			default:
 				return this->operator bool() == false;
@@ -108,34 +108,34 @@ struct Variant {
 
 
 	bool IsEmptyOrVoid() const {
-		return _currentType & (StoredType::Void | StoredType::Empty);
+		return _currentType & (Void | Empty);
 	}
 
 	bool IsInt() const {
-		return (_currentType & (StoredType::Int32 | StoredType::UInt32 | StoredType::Int64 | StoredType::UInt64));
+		return (_currentType & (Int32 | UInt32 | Int64 | UInt64));
 	};
 
 	bool IsNumeric() const {
-		return (_currentType & (StoredType::Int32 | StoredType::UInt32 | StoredType::Int64 | StoredType::UInt64 | StoredType::Float | StoredType::Double));
+		return (_currentType & (Int32 | UInt32 | Int64 | UInt64 | Float | Double));
 	};
 
 	bool IsSignedInt() const {
-		return (_currentType & (StoredType::Int32 | StoredType::Int64));
+		return (_currentType & (Int32 | Int64));
 	};
 
 	static char* BinarySerialise(Variant v);
-	static int32_t BinarySerialisationLength(char* bin);
+	static int32_t BinarySerialisationLength(const char* bin);
 	static std::string StringSerialise(Variant v);
-	static Variant FromString(std::string* str);
+	static Variant FromString(const std::string* str);
 	
 	//// Operators and constructors
 
 	Variant() { 
 		_primitiveData._int = 0; 
-		_currentType = StoredType::Empty; 
+		_currentType = Empty;
 	};
 
-	Variant(StoredType type) {
+	explicit Variant(const StoredType type) {
 		_primitiveData._int = 0;
 		_currentType = type;
 	}
@@ -144,23 +144,23 @@ struct Variant {
 		_currentType = other._currentType;
 		switch (_currentType)
 		{
-			case Variant::Bool:
-			case Variant::Int32:
-			case Variant::UInt32:
-			case Variant::Int64:
-			case Variant::UInt64:
-			case Variant::Float:
-			case Variant::Double:
+			case Bool:
+			case Int32:
+			case UInt32:
+			case Int64:
+			case UInt64:
+			case Float:
+			case Double:
 				_primitiveData = other._primitiveData;
 				break;
-			case Variant::String:
-				_primitiveData._ptr = new string(*(string*)other._primitiveData._ptr);
+			case String:
+				_primitiveData._ptr = new string(*static_cast<string *>(other._primitiveData._ptr));
 				break;
-			case Variant::VariantArray:
-				_primitiveData._ptr = new std::vector<Variant>(*(std::vector<Variant>*)other._primitiveData._ptr);
+			case VariantArray:
+				_primitiveData._ptr = new std::vector(*static_cast<std::vector<Variant> *>(other._primitiveData._ptr));
 				break;
-			case Variant::UInt32Array:
-				_primitiveData._ptr = new std::vector<uint32_t>(*(std::vector<uint32_t>*)other._primitiveData._ptr);
+			case UInt32Array:
+				_primitiveData._ptr = new std::vector(*static_cast<std::vector<uint32_t> *>(other._primitiveData._ptr));
 				break;
 			default:
 				_primitiveData._int = 0;
@@ -173,23 +173,23 @@ struct Variant {
 		_currentType = other._currentType;
 		switch (_currentType)
 		{
-			case Variant::Bool:
-			case Variant::Int32:
-			case Variant::UInt32:
-			case Variant::Int64:
-			case Variant::UInt64:
-			case Variant::Float:
-			case Variant::Double:
+			case Bool:
+			case Int32:
+			case UInt32:
+			case Int64:
+			case UInt64:
+			case Float:
+			case Double:
 				_primitiveData = other._primitiveData;
 				break;
-			case Variant::String:
-				_primitiveData._ptr = new string(*(string*)other._primitiveData._ptr);
+			case String:
+				_primitiveData._ptr = new string(*static_cast<string *>(other._primitiveData._ptr));
 				break;
-			case Variant::VariantArray:
-				_primitiveData._ptr = new std::vector<Variant>(*(std::vector<Variant>*)other._primitiveData._ptr);
+			case VariantArray:
+				_primitiveData._ptr = new std::vector(*static_cast<std::vector<Variant> *>(other._primitiveData._ptr));
 				break;
-			case Variant::UInt32Array:
-				_primitiveData._ptr = new std::vector<uint32_t>(*(std::vector<uint32_t>*)other._primitiveData._ptr);
+			case UInt32Array:
+				_primitiveData._ptr = new std::vector(*static_cast<std::vector<uint32_t> *>(other._primitiveData._ptr));
 				break;
 			default:
 				_primitiveData._int = 0;
@@ -202,7 +202,7 @@ struct Variant {
 		_primitiveData = other._primitiveData;
 		_currentType = other._currentType;
 		other._primitiveData._int = 0;
-		other._currentType = StoredType::Empty;
+		other._currentType = Empty;
 	};
 
 
@@ -222,40 +222,40 @@ struct Variant {
 			_primitiveData._int = data;
 		}
 		else if constexpr (std::is_same_v<T, uint32_t>) {
-			_currentType = StoredType::UInt32;
+			_currentType = UInt32;
 			_primitiveData._uint = data;
 		}
 		else if constexpr (std::is_same_v<T, int64_t>) {
-			_currentType = StoredType::Int64;
+			_currentType = Int64;
 			_primitiveData._llong = data;
 		}
 		else if constexpr (std::is_same_v<T, uint64_t>) {
-			_currentType = StoredType::UInt64;
+			_currentType = UInt64;
 			_primitiveData._ullong = data;
 
 		}
 		else if constexpr (std::is_same_v<T, float>) {
-			_currentType = StoredType::Float;
+			_currentType = Float;
 			_primitiveData._float = data;
 		}
 		else if constexpr (std::is_same_v<T, double>) {
-			_currentType = StoredType::Double;
+			_currentType = Double;
 			_primitiveData._double = data;
 		}
 		else if constexpr (std::is_same_v<T, const char*>) {
-			_currentType = StoredType::String;
+			_currentType = String;
 			_primitiveData._ptr = new string(data);
 		}
 		else if constexpr (std::is_same_v<T, string>) {
-			_currentType = StoredType::String;
+			_currentType = String;
 			_primitiveData._ptr = new std::string(std::forward<T>(data));
 		}
 		else if constexpr (std::is_same_v<T, std::vector<Variant>>) {
-			_currentType = StoredType::VariantArray;
+			_currentType = VariantArray;
 			_primitiveData._ptr = new std::vector<Variant>(std::forward<T>(data));
 		}
 		else if constexpr (std::is_same_v<T, std::vector<uint32_t>>) {
-			_currentType = StoredType::UInt32Array;
+			_currentType = UInt32Array;
 			_primitiveData._ptr = new std::vector<uint32_t>(std::forward<T>(data));
 		}
 		else {
@@ -266,9 +266,9 @@ struct Variant {
 	~Variant() {
 		switch (_currentType)
 		{
-			case Variant::String:
-			case Variant::VariantArray:
-			case Variant::UInt32Array:
+			case String:
+			case VariantArray:
+			case UInt32Array:
 				delete _primitiveData._ptr;
 				break;
 			default:
@@ -281,25 +281,25 @@ struct Variant {
 		using U = std::decay_t<T>;
 		if constexpr (std::is_same_v<U, bool>) {
 			switch (_currentType) {
-				case StoredType::Bool: return _primitiveData._bool;
-				case StoredType::Int32: return _primitiveData._int != 0;
-				case StoredType::UInt32: return _primitiveData._uint != 0;
-				case StoredType::Int64: return _primitiveData._llong != 0;
-				case StoredType::UInt64: return _primitiveData._ullong != 0;
-				case StoredType::Float: return _primitiveData._float != 0.0f;
-				case StoredType::Double: return _primitiveData._double != 0.0;
+				case Bool: return _primitiveData._bool;
+				case Int32: return _primitiveData._int != 0;
+				case UInt32: return _primitiveData._uint != 0;
+				case Int64: return _primitiveData._llong != 0;
+				case UInt64: return _primitiveData._ullong != 0;
+				case Float: return _primitiveData._float != 0.0f;
+				case Double: return _primitiveData._double != 0.0;
 				default: return false;
 			}
 		}
 		else if constexpr (std::is_arithmetic_v<U>) {
 			switch (_currentType) {
-				case StoredType::Bool: return static_cast<U>(_primitiveData._bool);
-				case StoredType::Int32: return static_cast<U>(_primitiveData._int);
-				case StoredType::UInt32: return static_cast<U>(_primitiveData._uint);
-				case StoredType::Int64: return static_cast<U>(_primitiveData._llong);
-				case StoredType::UInt64: return static_cast<U>(_primitiveData._ullong);
-				case StoredType::Float: return static_cast<U>(_primitiveData._float);
-				case StoredType::Double: return static_cast<U>(_primitiveData._double);
+				case Bool: return static_cast<U>(_primitiveData._bool);
+				case Int32: return static_cast<U>(_primitiveData._int);
+				case UInt32: return static_cast<U>(_primitiveData._uint);
+				case Int64: return static_cast<U>(_primitiveData._llong);
+				case UInt64: return static_cast<U>(_primitiveData._ullong);
+				case Float: return static_cast<U>(_primitiveData._float);
+				case Double: return static_cast<U>(_primitiveData._double);
 				default: return U{};
 			}
 		}
@@ -309,26 +309,26 @@ struct Variant {
 
 	}
 
-	operator std::string() const {
+	explicit operator std::string() const {
 		switch (_currentType) {
-			case StoredType::Empty:
-			case StoredType::Void:
+			case Empty:
+			case Void:
 				return "";
-			case StoredType::Bool:
+			case Bool:
 				return _primitiveData._bool ? "true" : "false";
-			case StoredType::Int32:
+			case Int32:
 				return std::to_string(_primitiveData._int);
-			case StoredType::UInt32:
+			case UInt32:
 				return std::to_string(_primitiveData._uint);
-			case StoredType::Int64:
+			case Int64:
 				return std::to_string(_primitiveData._llong);
-			case StoredType::UInt64:
+			case UInt64:
 				return std::to_string(_primitiveData._ullong);
-			case StoredType::Float:
+			case Float:
 				return std::to_string(_primitiveData._float);
-			case StoredType::Double:
+			case Double:
 				return std::to_string(_primitiveData._double);
-			case StoredType::String:
+			case String:
 				return *static_cast<string *>(_primitiveData._ptr);
 			default:
 				return "";
@@ -337,7 +337,7 @@ struct Variant {
 
 	explicit operator std::vector<Variant>() const {
 		switch (_currentType) {
-			case StoredType::VariantArray:
+			case VariantArray:
 				return *static_cast<std::vector<Variant> *>(_primitiveData._ptr);
 			default:
 				return {};
@@ -346,7 +346,7 @@ struct Variant {
 
 	explicit operator std::vector<uint32_t>() const {
 		switch (_currentType) {
-			case StoredType::UInt32Array:
+			case UInt32Array:
 				return *static_cast<std::vector<uint32_t> *>(_primitiveData._ptr);
 			default:
 				return {};

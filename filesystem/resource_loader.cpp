@@ -65,7 +65,7 @@ bool ResourceLoader::IsResourceImported(string filePath) {
 
 bool ResourceLoader::HasImportCacheChanged(string filePath) {
     if (!projectResources.contains(filePath)) return true;
-    EngineIO::File extResource = EngineIO::FileSystem::OpenFile(filePath, std::ios::binary | std::ios::in);
+    File extResource = FileSystem::OpenFile(filePath, std::ios::binary | std::ios::in);
     return projectResources[filePath].hash != extResource.GetHash();
 
 }
@@ -73,25 +73,25 @@ bool ResourceLoader::HasImportCacheChanged(string filePath) {
 ResourceLoader::ImportResult ResourceLoader::ImportResource(string extResourcePath)
 {
     Log.Debug("ResourceLoader", "Importing resource: " + extResourcePath);
-    EngineIO::File extResource = EngineIO::FileSystem::OpenFile(extResourcePath, std::ios::binary | std::ios::in);
+    File extResource = FileSystem::OpenFile(extResourcePath, std::ios::binary | std::ios::in);
     string resHash = extResource.GetHash();
 
     string sourceType = extResource.FileType().erase(0,1);
 
-    constexpr std::array supportedImageTypes = {
+    string supportedImageTypes[11] = {
         "jpg", "jpeg", "png", "bmp", "psd",
         "tga", "gif", "hdr", "pic", "ppm", "pgm"
     };
 
-    if (std::find(supportedImageTypes.begin(), supportedImageTypes.end(), sourceType) != supportedImageTypes.end()) {
+    if (ranges::find(supportedImageTypes, sourceType) != std::end(supportedImageTypes)) {
         
     }
 
-    constexpr std::array supportedShaderTypes = {
+    string supportedShaderTypes[9] = {
         "vert", "frag", "tesc", "tese", "geom", "comp", "glsl", "hlsl", "spv"
     };
 
-    if (std::find(supportedShaderTypes.begin(), supportedShaderTypes.end(), sourceType) != supportedShaderTypes.end()) {
+    if (ranges::find(supportedShaderTypes, sourceType) != std::end(supportedShaderTypes)) {
         Shader::ShaderStage stage{};
         if (sourceType == "vert") stage = Shader::ShaderStage::StageVert;
         if (sourceType == "frag") stage = Shader::ShaderStage::StageFrag;
@@ -99,7 +99,7 @@ ResourceLoader::ImportResult ResourceLoader::ImportResource(string extResourcePa
         if (sourceType == "tese") stage = Shader::ShaderStage::StageTessEval;
         if (sourceType == "geom") stage = Shader::ShaderStage::StageGeom;
         if (sourceType == "comp") stage = Shader::ShaderStage::StageComp;
-        Shader* shader = Shader::Create(extResource.ReadAllText(), Shader::ShaderLanguage::LanguageGLSL, stage);
+        auto shader = new Shader(extResource.ReadAllText(), Shader::ShaderLanguage::LanguageGLSL, stage);
         _updateCache(resHash, extResourcePath, shader);
         loadedResources[extResourcePath] = shader;
 

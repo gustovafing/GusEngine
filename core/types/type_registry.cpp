@@ -1,7 +1,4 @@
 #include "type_registry.h"
-#include <functional>
-#include <utility>
-#include "typeinfo"
 
 #include "core/types/resource.h"
 #include "project/resources/shader.h"
@@ -36,7 +33,7 @@ void type_registry::register_new_class(string new_class_name, string parent_clas
 
 }
 
-void engine_type_registry::type_registry::class_define_property(ObjectRTTIModel::ObjectPropertyDefinition def) {
+void type_registry::class_define_property(ObjectRTTIModel::ObjectPropertyDefinition def) {
 	if (_registered_classes[_currentClass]._properties.contains(def.propertyName)) {
 		Log.Warn("TypeRegistry", "Attempted to redefine property " + _currentClass + "::" + def.propertyName);
 		return;

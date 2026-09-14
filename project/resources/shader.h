@@ -22,14 +22,18 @@ namespace resources {
 			StageComp
 		};
 
-		static Shader* Create(const std::string& source, ShaderLanguage lang, ShaderStage stage);
-		
-		Shader() {};
+	private:
+		VkShaderModule _shaderModule = nullptr;
+		vector<uint32_t> _spirvBinary;
+		ShaderLanguage _lang = ShaderLanguage::LanguageGLSL;
+		ShaderStage _stage = ShaderStage::StageUnknown;
 
-		~Shader();
-		virtual void _Init() override {
 
-		}
+	public:
+
+		Shader() {}
+
+		explicit Shader(const std::string& source, ShaderLanguage lang, ShaderStage stage);
 
 		VkShaderModule GetShaderModule(VkDevice device);
 
@@ -40,10 +44,5 @@ namespace resources {
 		ShaderLanguage GetLanguage() const { return _lang; };
 		ShaderStage GetStage() const { return _stage; };
 
-		private:
-		VkShaderModule _shaderModule = nullptr;
-		vector<uint32_t> _spirvBinary;
-		ShaderLanguage _lang = ShaderLanguage::LanguageGLSL;
-		ShaderStage _stage = ShaderStage::StageUnknown;
 	};
 }

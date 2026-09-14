@@ -4,11 +4,8 @@
 #include <map>
 #include <vector>
 #include <functional>
-#include <concepts>
 #include <utility>
 #include <type_traits>
-#include <array>
-#include <algorithm>
 #include <iterator>
 #include "object.h"
 #include "variant_type.h"
@@ -27,7 +24,7 @@ string _DerivedFrom() override {return #DERIVED; } \
 private: \
 
 template <class Type>
-concept IsDerivedFromObject = std::is_base_of<Object, Type>::value;
+concept IsDerivedFromObject = std::is_base_of_v<Object, Type>;
 
 template <typename T>
 static Object* dynamic_constructor() {
@@ -58,14 +55,14 @@ static Variant call_class_method_helper_impl(T* obj, R(T::* method)(Args...)cons
 }
 
 template <typename R, typename T, typename... Args> requires IsDerivedFromObject<T>
-static Variant call_class_method_helper(T* obj, R(T::* method)(Args...), const vector<Variant> args, int32_t requiredArgCount, const vector<Variant>& defaultArgs, bool& callSuccessfull) {
+static Variant call_class_method_helper(T* obj, R(T::* method)(Args...), const vector<Variant> args, const int32_t requiredArgCount, const vector<Variant>& defaultArgs, bool& callSuccessfull) {
 	if (args.size() < requiredArgCount) {
 		callSuccessfull = false;
 		return Variant(Variant::Void);
 	}
 
 	Variant resolvedArgs[sizeof...(Args) == 0 ? 1 : sizeof...(Args)]{};
-	for (int32_t i = 0; i < (int32_t)sizeof...(Args); i++) {
+	for (int32_t i = 0; i < static_cast<int32_t>(sizeof...(Args)); i++) {
 		if (i >= args.size()-1) {
 			resolvedArgs[i] = args[i];
 		}
@@ -85,7 +82,7 @@ static Variant call_class_method_helper(T* obj, R(T::* method)(Args...) const, c
 	}
 
 	Variant resolvedArgs[sizeof...(Args) == 0 ? 1 : sizeof...(Args)]{};
-	for (int32_t i = 0; i < (int32_t)sizeof...(Args); i++) {
+	for (int32_t i = 0; i < static_cast<int32_t>(sizeof...(Args)); i++) {
 		if (i >= args.size() - 1) {
 			resolvedArgs[i] = args[i];
 		}
@@ -102,6 +99,7 @@ namespace engine_type_registry {
 
 	class ObjectMethod {
 		public:
+		virtual ~ObjectMethod() = default;
 		ObjectRTTIModel::ObjectMethodDefinition methodMetadata;
 		ObjectMethod(ObjectRTTIModel::ObjectMethodDefinition methodInfo) {
 			methodMetadata = methodInfo;
@@ -111,7 +109,7 @@ namespace engine_type_registry {
 	};
 
 	template <typename R, typename T, typename... Args> requires IsDerivedFromObject<T>
-	class BindedObjectMethod : public ObjectMethod {
+	class BoundObjectMethod : public ObjectMethod {
 		private:
 		bool _isConst;
 
@@ -119,7 +117,7 @@ namespace engine_type_registry {
 		R(T::* constMethod)(Args...) const = nullptr;
 		R(T::* method)(Args...) = nullptr;
 		
-		virtual Variant Call(Object* obj, std::vector<Variant> args) const override {
+		Variant Call(Object* obj, std::vector<Variant> args) const override {
 			bool success = false;
 			if (_isConst) {
 				return call_class_method_helper<R, T, Args...>(static_cast<T*>(obj), constMethod, args, methodMetadata.requiredArgCount, methodMetadata.defaultArgValues, success);
@@ -129,11 +127,11 @@ namespace engine_type_registry {
 			}
 		}
 		
-		BindedObjectMethod(R(T::* met)(Args...) const, ObjectRTTIModel::ObjectMethodDefinition methodInfo): ObjectMethod(methodInfo) {
+		BoundObjectMethod(R(T::* met)(Args...) const, const ObjectRTTIModel::ObjectMethodDefinition &methodInfo): ObjectMethod(methodInfo) {
 			constMethod = met;
 			_isConst = true;
 		}
-		BindedObjectMethod(R(T::* met)(Args...), ObjectRTTIModel::ObjectMethodDefinition methodInfo) : ObjectMethod(methodInfo) {
+		BoundObjectMethod(R(T::* met)(Args...), const ObjectRTTIModel::ObjectMethodDefinition &methodInfo) : ObjectMethod(methodInfo) {
 			method = met;
 			_isConst = false;
 		}
@@ -181,7 +179,7 @@ namespace engine_type_registry {
 				return;
 			}
 			_registered_classes[_currentClass]._methods[methodInfo.methodName] = methodInfo;
-			_registered_classes[_currentClass]._methodBinds[methodInfo.methodName] = new BindedObjectMethod<R, T, Args...>(func, methodInfo);
+			_registered_classes[_currentClass]._methodBinds[methodInfo.methodName] = new BoundObjectMethod<R, T, Args...>(func, methodInfo);
 			return;
 		};
 
@@ -193,7 +191,7 @@ namespace engine_type_registry {
 				return;
 			}
 			_registered_classes[_currentClass]._methods[methodInfo.methodName] = methodInfo;
-			_registered_classes[_currentClass]._methodBinds[methodInfo.methodName] = new BindedObjectMethod<R, T, Args...>(func, methodInfo);
+			_registered_classes[_currentClass]._methodBinds[methodInfo.methodName] = new BoundObjectMethod<R, T, Args...>(func, methodInfo);
 			return;
 		};
 

@@ -10,7 +10,6 @@ using namespace resources;
 
 class ResourceLoader
 {
-	private:
 	struct ImportedResource {
 		string location;
 		string hash;
@@ -21,7 +20,8 @@ class ResourceLoader
 	static std::unordered_map<string, ImportedResource> projectResources;
 	
 	static void _updateCache(string hash, string filePath, Resource* res);
-	static Resource* _load(const string filePath);
+	static Resource* _load(string filePath);
+
 	public:
 	enum class ImportResult {
 		IMPORTED,

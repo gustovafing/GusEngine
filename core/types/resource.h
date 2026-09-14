@@ -27,6 +27,5 @@ namespace resources {
 		void SetPath(string path) { _resourcePath = path; }
 
 		Resource(): _resourceId(_idGen.Next()) {}
-		virtual ~Resource() {}
 	};
 }

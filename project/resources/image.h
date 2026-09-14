@@ -38,7 +38,7 @@ namespace resources {
 		static Image* CreateFromFile(string filePath);
 
 
-		~Image();
+		~Image() override;
 	};
 
 }

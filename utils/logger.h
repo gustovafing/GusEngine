@@ -13,7 +13,8 @@ enum class LogLevel {
 class Logger {
     private:
     void Write(LogLevel lvl, string msg, string source = "");
-    inline string GetLevelLabel(LogLevel lvl) {
+
+    static string GetLevelLabel(LogLevel lvl) {
         switch (lvl) {
             case LogLevel::DEBUG: return "DEBUG";
             case LogLevel::INFO: return "INFO";
