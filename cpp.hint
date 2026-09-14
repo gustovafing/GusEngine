@@ -1,3 +1,0 @@
-#define GUS_DECLARE_CLASS(NAME, DERIVED) friend void engine_type_registry::type_registry::register_all_types(); static void _register_type(); static string _get_type() {return #NAME; } static string _get_parent_type() {return #DERIVED; }
-#define CONSTRUCT(enumV, typeN, unionV) Variant(typeN data): _currentType(enumV) {_primitiveData.unionV = data;};
-#define CONSTRUCT_PTR(enumV, typeN) Variant(typeN data): _currentType(enumV) {_primitiveData._ptr = new typeN(data);};
